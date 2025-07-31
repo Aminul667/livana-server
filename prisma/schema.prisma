@@ -65,12 +65,16 @@ model Property {
   longitude  Float? // optional in Zod
 
   // Details
-  bedrooms    Int
-  bathrooms   Int
-  areaSqFt    Float
-  floorNumber Int
-  totalFloors Int? // optional in Zod
-  furnished   FurnishedStatus
+  bedrooms             Int
+  bathrooms            Int
+  areaSqFt             Float
+  floorNumber          Int
+  totalFloors          Int? // optional in Zod
+  furnished            FurnishedStatus
+  coverImage           String
+  availableFrom        String
+  availableMonth       String
+  availableMonthNumber String
 
   // Rent Specific
   rentFrequency  RentFrequency?
@@ -88,6 +92,7 @@ model Property {
   internetIncluded Boolean
 
   videoUrl String?
+  status   ListingStatus @default(draft)
 
   images PropertyImage[] // relation to image model
   user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -144,4 +149,9 @@ enum RentFrequency {
   monthly
   half_yearly
   yearly
+}
+
+enum ListingStatus {
+  draft // saved but unpublished
+  published // paid & published
 }

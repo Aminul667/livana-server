@@ -1,0 +1,1 @@
+export type TImageFiles = { [fieldname: string]: Express.Multer.File[] };

@@ -42,8 +42,6 @@ const createUserIntoDB = async (payload: IUser) => {
 };
 
 const updateUserProfileIntoDB = async (req: IAuthRequest) => {
-  console.log("User Profile Service");
-
   if (!req.user) {
     throw new Error("User information is missing.");
   }
@@ -51,8 +49,6 @@ const updateUserProfileIntoDB = async (req: IAuthRequest) => {
   const { firstName, lastName, phone, location, about } = req.body;
   const userId = req.user.userId;
   const profilePhoto = req.file?.path || "";
-
-  console.log("file", req.file);
 
   const profileData = {
     firstName,
