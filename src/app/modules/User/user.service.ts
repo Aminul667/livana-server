@@ -1,9 +1,11 @@
 import { hashedPasswordHelper } from "../../../helpers/hashPasswordHelper";
 import prisma from "../../../shared/prisma";
-import { IUser } from "./user.interface";
+import ApiError from "../../errors/ApiErrors";
+import httpStatus from "http-status";
+import { IAuthRequest, IUser } from "./user.interface";
 
-const createAdminIntoDB = async (payload: IUser) => {
-  const { email, password } = payload;
+const createUserIntoDB = async (payload: IUser) => {
+  const { email, password, role } = payload;
 
   // Check if email already exists
   const existingUser = await prisma.user.findUnique({
@@ -11,7 +13,10 @@ const createAdminIntoDB = async (payload: IUser) => {
   });
 
   if (existingUser) {
-    throw new Error("Admin already exists with this email");
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      "User already exists with this email"
+    );
   }
 
   // Hash the password
@@ -22,6 +27,7 @@ const createAdminIntoDB = async (payload: IUser) => {
     data: {
       email: email,
       password: hashedPassword,
+      role: role,
     },
   });
 
@@ -29,11 +35,56 @@ const createAdminIntoDB = async (payload: IUser) => {
   return {
     id: createdUser.id,
     email: createdUser.email,
-    needPasswordChange: createdUser.needPasswordChange,
+    role: createdUser.role,
+    isProfileCompleted: createdUser.isProfileCompleted,
     createdAt: createdUser.createdAt,
   };
 };
 
+const updateUserProfileIntoDB = async (req: IAuthRequest) => {
+  console.log("User Profile Service");
+
+  if (!req.user) {
+    throw new Error("User information is missing.");
+  }
+
+  const { firstName, lastName, phone, location, about } = req.body;
+  const userId = req.user.userId;
+  const profilePhoto = req.file?.path || "";
+
+  console.log("file", req.file);
+
+  const profileData = {
+    firstName,
+    lastName,
+    phone,
+    location,
+    about,
+    profilePhoto,
+  };
+
+  const result = await prisma.$transaction(async (tx) => {
+    const updatedProfile = await tx.profile.upsert({
+      where: { userId },
+      update: profileData,
+      create: {
+        userId,
+        ...profileData,
+      },
+    });
+
+    await tx.user.update({
+      where: { id: userId },
+      data: { isProfileCompleted: true },
+    });
+
+    return updatedProfile;
+  });
+
+  return result;
+};
+
 export const userService = {
-  createAdminIntoDB,
+  createUserIntoDB,
+  updateUserProfileIntoDB,
 };

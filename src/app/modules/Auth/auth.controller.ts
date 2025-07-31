@@ -8,10 +8,10 @@ import config from "../../../config";
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.loginUser(req.body);
 
-  const { refreshToken } = result;
+  const { refreshToken, accessToken } = result;
 
   res.cookie("refreshToken", refreshToken, {
-    secure: false,
+    secure: config.env === "production",
     httpOnly: true,
   });
 
@@ -20,8 +20,8 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: "Logged in successfully!",
     data: {
-      refreshToken: refreshToken,
-      accessToken: result.accessToken,
+      // refreshToken: refreshToken,
+      accessToken,
     },
   });
 });
@@ -42,7 +42,7 @@ const logInWithSocialMedia = catchAsync(async (req, res) => {
     message: "User is logged in successfully!",
     data: {
       accessToken,
-      refreshToken,
+      // refreshToken,
     },
   });
 });

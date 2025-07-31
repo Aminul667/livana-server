@@ -18,7 +18,7 @@ const storage = new CloudinaryStorage({
         file.fieldname +
         "-" +
         removeExtension(file.originalname),
-      folder: "arthur",
+      folder: "livana",
       access_mode: "public",
       resource_type: "auto",
       type: "upload",

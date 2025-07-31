@@ -14,12 +14,134 @@ datasource db {
 }
 
 model User {
-  id                 String   @id @default(uuid())
-  email              String   @unique
+  id                 String        @id @unique @default(uuid())
+  email              String        @unique
   password           String
-  needPasswordChange Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  role               UserRole
+  isProfileCompleted Boolean       @default(false)
+  provider           UserProviders @default(local)
+  isDeleted          Boolean       @default(false)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  profile            Profile?
+  Property           Property[]
 
   @@map("users")
+}
+
+model Profile {
+  id           String   @id @unique @default(uuid())
+  userId       String   @unique
+  firstName    String
+  lastName     String
+  phone        String   @unique
+  location     String
+  about        String
+  profilePhoto String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profile")
+}
+
+model Property {
+  id           String       @id @default(uuid())
+  userId       String
+  description  String
+  price        Float
+  listingType  ListingType
+  propertyType PropertyType
+  purpose      Purpose
+
+  // Location
+  address    String
+  city       String
+  state      String
+  postalCode String
+  country    String
+  latitude   Float? // optional in Zod
+  longitude  Float? // optional in Zod
+
+  // Details
+  bedrooms    Int
+  bathrooms   Int
+  areaSqFt    Float
+  floorNumber Int
+  totalFloors Int? // optional in Zod
+  furnished   FurnishedStatus
+
+  // Rent Specific
+  rentFrequency  RentFrequency?
+  depositAmount  Float?
+  maintenanceFee Float?
+
+  // Features
+  amenities        String[]
+  hasParking       Boolean
+  hasLift          Boolean
+  hasBalcony       Boolean
+  heating          Boolean
+  cooling          Boolean
+  petFriendly      Boolean
+  internetIncluded Boolean
+
+  videoUrl String?
+
+  images PropertyImage[] // relation to image model
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PropertyImage {
+  id         String   @id @default(uuid())
+  propertyId String
+  url        String // path or full URL
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+enum UserRole {
+  landlord
+  tenant
+  admin
+}
+
+enum UserProviders {
+  local
+  google
+  facebook
+}
+
+enum ListingType {
+  rent
+  sale
+}
+
+enum PropertyType {
+  flat
+  house
+  villa
+  studio
+}
+
+enum Purpose {
+  residential
+  commercial
+}
+
+enum FurnishedStatus {
+  furnished
+  semi_furnished
+  unfurnished
+}
+
+enum RentFrequency {
+  monthly
+  half_yearly
+  yearly
 }

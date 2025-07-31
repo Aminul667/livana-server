@@ -5,7 +5,6 @@ import * as bcrypt from "bcrypt";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import config from "../../../config";
 import { Secret } from "jsonwebtoken";
-import { generate } from "generate-password";
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUnique({
@@ -30,7 +29,8 @@ const loginUser = async (payload: { email: string; password: string }) => {
   const dataForToken = {
     userId: userData.id,
     email: userData.email,
-    needPasswordChange: userData.needPasswordChange,
+    role: userData.role,
+    isProfileCompleted: userData.isProfileCompleted,
   };
 
   const accessToken = jwtHelpers.generateToken(
@@ -75,7 +75,7 @@ const refreshToken = async (token: string) => {
   const dataForToken = {
     userId: userData.id,
     email: userData.email,
-    needPasswordChange: userData.needPasswordChange,
+    needPasswordChange: userData.isProfileCompleted,
   };
 
   const accessToken = jwtHelpers.generateToken(
@@ -100,7 +100,8 @@ const logInWithSocialMedia = async (payload: {
     select: {
       id: true,
       email: true,
-      needPasswordChange: true,
+      role: true,
+      isProfileCompleted: true,
     },
   });
 
@@ -114,7 +115,8 @@ const logInWithSocialMedia = async (payload: {
   const dataForToken = {
     userId: user.id,
     email: user.email,
-    needPasswordChange: user.needPasswordChange,
+    role: user.role,
+    isProfileCompleted: user.isProfileCompleted,
   };
 
   const accessToken = jwtHelpers.generateToken(

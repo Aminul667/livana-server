@@ -3,10 +3,10 @@ import { userService } from "./user.service";
 import catchAsync from "../../../shared/catchAsync";
 import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponse";
+import { IAuthRequest } from "./user.interface";
 
-// request and response are handled by controller
-const createAdmin = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.createAdminIntoDB(req.body);
+const createUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.createUserIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -15,6 +15,19 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateUserProfile = catchAsync(
+  async (req: IAuthRequest, res: Response) => {
+    const result = await userService.updateUserProfileIntoDB(req);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User profile updated successfully!",
+      data: result,
+    });
+  }
+);
+
 export const userController = {
-  createAdmin,
+  createUser,
+  updateUserProfile,
 };
