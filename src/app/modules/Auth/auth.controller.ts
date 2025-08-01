@@ -5,24 +5,48 @@ import { AuthServices } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
 import config from "../../../config";
 
+// const loginUser = catchAsync(async (req: Request, res: Response) => {
+//   const result = await AuthServices.loginUser(req.body);
+
+//   const { refreshToken, accessToken } = result;
+
+//   res.cookie("refreshToken", refreshToken, {
+//     secure: config.env === "production",
+//     httpOnly: true,
+//   });
+
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "Logged in successfully!",
+//     data: {
+//       accessToken,
+//     },
+//   });
+// });
+
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.loginUser(req.body);
-
   const { refreshToken, accessToken } = result;
 
-  res.cookie("refreshToken", refreshToken, {
-    secure: config.env === "production",
+  // Store both tokens securely in cookies
+  res.cookie("accessToken", accessToken, {
     httpOnly: true,
+    secure: config.env === "production",
+    sameSite: "lax",
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: config.env === "production",
+    sameSite: "lax",
   });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Logged in successfully!",
-    data: {
-      // refreshToken: refreshToken,
-      accessToken,
-    },
+    data: null, // Don't send token in body
   });
 });
 
