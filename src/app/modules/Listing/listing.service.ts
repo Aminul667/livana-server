@@ -1,3 +1,4 @@
+import prisma from "../../../shared/prisma";
 import { IAuthRequest } from "../User/user.interface";
 import { extractMonthInfo } from "./listing.utils";
 
@@ -16,32 +17,7 @@ const addPropertyIntoDB = async (req: IAuthRequest) => {
 
   const userId = req.user.userId;
   const {
-    description,
-    price,
-    listingType,
-    propertyType,
-    purpose,
-    address,
-    city,
-    state,
-    postalCode,
-    country,
-    latitude,
-    longitude,
-    bedrooms,
-    bathrooms,
-    areaSqFt,
-    floorNumber,
-    totalFloors,
-    furnished,
-    // coverImage
     availableFrom,
-    // availableMonth
-    // availableMonthNumber
-    rentFrequency,
-    depositAmount,
-    maintenanceFee,
-    // amenities,
     hasParking,
     hasLift,
     hasBalcony,
@@ -49,10 +25,9 @@ const addPropertyIntoDB = async (req: IAuthRequest) => {
     cooling,
     petFriendly,
     internetIncluded,
-    videoUrl,
   } = req.body;
 
-    const coverImage = uploadedImagePaths[0];
+  const coverImage = uploadedImagePaths[0];
   const { availableMonth, availableMonthNumber } =
     extractMonthInfo(availableFrom);
 
@@ -64,7 +39,6 @@ const addPropertyIntoDB = async (req: IAuthRequest) => {
     cooling,
     petFriendly,
     internetIncluded,
-    videoUrl,
   };
 
   const amenities = Object.entries(amenitiesObject)
@@ -73,46 +47,31 @@ const addPropertyIntoDB = async (req: IAuthRequest) => {
 
   const propertyData = {
     userId,
-    description,
-    price,
-    listingType,
-    propertyType,
-    purpose,
-    address,
-    city,
-    state,
-    postalCode,
-    country,
-    latitude,
-    longitude,
-    bedrooms,
-    bathrooms,
-    areaSqFt,
-    floorNumber,
-    totalFloors,
-    furnished,
+    ...req.body,
     coverImage,
-    availableFrom,
     availableMonth,
     availableMonthNumber,
-    rentFrequency,
-    depositAmount,
-    maintenanceFee,
     amenities,
-    hasParking,
-    hasLift,
-    hasBalcony,
-    heating,
-    cooling,
-    petFriendly,
-    internetIncluded,
-    videoUrl,
   };
 
-  console.log("imageFiles", uploadedImagePaths);
-    console.log("coverImage", coverImage);
+  const result = await prisma.$transaction(async (tx) => {
+    const property = await tx.property.create({
+      data: propertyData,
+    });
 
-  return propertyData;
+    const imageData = uploadedImagePaths.map((path) => ({
+      propertyId: property.id,
+      url: path,
+    }));
+
+    await tx.propertyImage.createMany({
+      data: imageData,
+    });
+
+    return property;
+  });
+
+  return result;
 };
 
 export const ListingService = {

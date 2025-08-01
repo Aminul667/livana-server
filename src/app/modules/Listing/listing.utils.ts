@@ -1,3 +1,5 @@
+import { TProperty } from "./listing.interface";
+
 export const extractMonthInfo = (dateString: string) => {
   const cleanDateString = dateString.replace(/(\d+)(st|nd|rd|th)/, "$1");
   const dateObj = new Date(cleanDateString);
@@ -7,3 +9,7 @@ export const extractMonthInfo = (dateString: string) => {
 
   return { availableMonth, availableMonthNumber };
 };
+
+export const cleanData = (payload: TProperty) => {
+  console.log(payload)
+}

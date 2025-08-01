@@ -74,7 +74,7 @@ model Property {
   coverImage           String
   availableFrom        String
   availableMonth       String
-  availableMonthNumber String
+  availableMonthNumber Int
 
   // Rent Specific
   rentFrequency  RentFrequency?
