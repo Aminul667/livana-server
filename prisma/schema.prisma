@@ -91,14 +91,18 @@ model Property {
   petFriendly      Boolean
   internetIncluded Boolean
 
-  videoUrl String?
-  status   ListingStatus @default(draft)
+  videoUrl   String?
+  isFeatured Boolean       @default(false)
+  status     ListingStatus @default(draft)
+  isDeleted  Boolean       @default(false)
 
   images PropertyImage[] // relation to image model
   user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("property")
 }
 
 model PropertyImage {
@@ -108,6 +112,8 @@ model PropertyImage {
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+
+  @@map("property_image")
 }
 
 enum UserRole {

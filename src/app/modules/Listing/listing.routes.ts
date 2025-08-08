@@ -7,6 +7,8 @@ import { parseJSONBody } from "../../middlewares/parseJSONBody";
 
 const router = express.Router();
 
+router.get("/", ListingController.getAllProperties);
+
 router.post(
   "/add",
   auth(UserRole.landlord),
