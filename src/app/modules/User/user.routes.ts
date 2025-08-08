@@ -7,12 +7,19 @@ import { parseJSONBody } from "../../middlewares/parseJSONBody";
 
 const router = express.Router();
 
+router.get(
+  "/me",
+  auth(UserRole.admin, UserRole.landlord, UserRole.tenant),
+  userController.getMe
+);
+
 router.post("/create-user", userController.createUser);
+
 router.post(
   "/update-profile",
   auth(UserRole.admin, UserRole.landlord, UserRole.tenant),
-  // multerUpload.single("profilePhoto"),
-  // parseJSONBody("data"),
+  multerUpload.single("profilePhoto"),
+  parseJSONBody("data"),
   userController.updateUserProfile
 );
 

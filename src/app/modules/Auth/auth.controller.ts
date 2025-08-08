@@ -30,13 +30,13 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken, accessToken } = result;
 
   // Store both tokens securely in cookies
-  res.cookie("accessToken", accessToken, {
+  res.cookie("accessToken", `${accessToken}`, {
     httpOnly: true,
     secure: config.env === "production",
     sameSite: "lax",
   });
 
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie("refreshToken", `${refreshToken}`, {
     httpOnly: true,
     secure: config.env === "production",
     sameSite: "lax",
@@ -46,7 +46,8 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Logged in successfully!",
-    data: null, // Don't send token in body
+    // data: null,
+    data: { accessToken },
   });
 });
 
@@ -84,10 +85,30 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// In Express controller
+export const logoutUser = catchAsync(async (req: Request, res: Response) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: config.env === "production",
+    sameSite: "lax",
+  });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: config.env === "production",
+    sameSite: "lax",
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+});
+
 export const AuthController = {
   loginUser,
   refreshToken,
   logInWithSocialMedia,
+  logoutUser,
   // changePassword,
   // forgotPassword,
   // resetPassword,

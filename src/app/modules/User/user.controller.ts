@@ -4,6 +4,7 @@ import catchAsync from "../../../shared/catchAsync";
 import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponse";
 import { IAuthRequest } from "./user.interface";
+import config from "../../../config";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createUserIntoDB(req.body);
@@ -17,7 +18,21 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
 const updateUserProfile = catchAsync(
   async (req: IAuthRequest, res: Response) => {
-    const result = await userService.updateUserProfileIntoDB(req);
+    const { result, accessToken, refreshToken } =
+      await userService.updateUserProfileIntoDB(req);
+
+    res.cookie("accessToken", `${accessToken}`, {
+      httpOnly: true,
+      secure: config.env === "production",
+      sameSite: "lax",
+    });
+
+    res.cookie("refreshToken", `${refreshToken}`, {
+      httpOnly: true,
+      secure: config.env === "production",
+      sameSite: "lax",
+    });
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -27,7 +42,18 @@ const updateUserProfile = catchAsync(
   }
 );
 
+const getMe = catchAsync(async (req: IAuthRequest, res: Response) => {
+  const result = await userService.getMeFromDB(req);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User retrieved successfully!",
+    data: result,
+  });
+});
+
 export const userController = {
   createUser,
   updateUserProfile,
+  getMe,
 };

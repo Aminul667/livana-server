@@ -6,6 +6,7 @@ import validateRequest from "../../middlewares/validateRequest";
 const router = express.Router();
 
 router.post("/login", AuthController.loginUser);
+router.post("/logout", AuthController.logoutUser);
 
 router.post(
   "/login-social-media",

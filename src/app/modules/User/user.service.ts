@@ -3,6 +3,9 @@ import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { IAuthRequest, IUser } from "./user.interface";
+import { AuthServices } from "../Auth/auth.service";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
+import config from "../../../config";
 
 const createUserIntoDB = async (payload: IUser) => {
   const { email, password, role } = payload;
@@ -69,18 +72,65 @@ const updateUserProfileIntoDB = async (req: IAuthRequest) => {
       },
     });
 
-    await tx.user.update({
+    const user = await tx.user.update({
       where: { id: userId },
       data: { isProfileCompleted: true },
     });
 
-    return updatedProfile;
+    return { updatedProfile, user };
   });
 
-  return result;
+  const dataForToken = {
+    userId: result.user.id,
+    email: result.user.email,
+    role: result.user.role,
+    isProfileCompleted: result.user.isProfileCompleted,
+  };
+
+  const accessToken = jwtHelpers.generateToken(
+    dataForToken,
+    config.jwt.jwt_secret as string,
+    config.jwt.expires_in as string
+  );
+
+  const refreshToken = jwtHelpers.generateToken(
+    dataForToken,
+    config.jwt.refresh_token_secret as string,
+    config.jwt.refresh_token_expires_in as string
+  );
+
+  return { result: result.updatedProfile, accessToken, refreshToken };
+};
+
+const getMeFromDB = async (req: IAuthRequest) => {
+  const userId = req.user?.userId;
+  console.log(userId);
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      isProfileCompleted: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          phone: true,
+          location: true,
+          about: true,
+          profilePhoto: true,
+        },
+      },
+    },
+  });
+
+  return user;
 };
 
 export const userService = {
   createUserIntoDB,
   updateUserProfileIntoDB,
+  getMeFromDB,
 };
