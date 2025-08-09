@@ -94,7 +94,7 @@ const getAllPropertiesFromDB = async (
     maxMonthlyRent,
     lat,
     lon,
-    maxDistanceMeters, 
+    maxDistanceMeters,
     status,
     ...rest
   } = filters as Record<string, any>;
@@ -104,9 +104,8 @@ const getAllPropertiesFromDB = async (
       ? options.sortBy
       : undefined;
 
-  const sortOrder = (
-    options.sortOrder?.toLowerCase() === "desc" ? "DESC" : "ASC"
-  ) as "ASC" | "DESC";
+  const sortOrder: "asc" | "desc" =
+    options.sortOrder === "desc" ? "desc" : "asc";
 
   // common non-geo filter conditions
   const andConditions: Prisma.PropertyWhereInput[] = [
@@ -253,40 +252,66 @@ const getAllPropertiesFromDB = async (
         )}" ${Prisma.raw(sortOrder)}`
       : Prisma.sql`ORDER BY distance_km ASC`;
 
+    const selectedColumns = Prisma.sql`
+      p.id,
+      p."listingType",
+      p."propertyType",
+      p.address,
+      p.city,
+      p.state,
+      p.country,
+      p.description,
+      p.price,
+      p.bedrooms,
+      p.bathrooms,
+      p."areaSqFt",
+      p."coverImage",
+      p.latitude,
+      p.longitude,
+      p.status
+`;
+    // Build the geo query
     const raw = Prisma.sql`
-  WITH filtered AS (
-    SELECT p.*
-    FROM "property" p
-    WHERE p."latitude" IS NOT NULL
-      AND p."longitude" IS NOT NULL
-      ${eqFilter}
-      ${searchFilter}
-      ${bedroomsFilter}
-      ${priceFilter}
-      ${bboxFilter}
-  ),
-  distanced AS (
-    SELECT
-      f.*,
-      (6371 * acos(
-        cos(radians(${latNum}))
-        * cos(radians(f."latitude"))
-        * cos(radians(f."longitude") - radians(${lonNum}))
-        + sin(radians(${latNum})) * sin(radians(f."latitude"))
-      )) AS distance_km
-    FROM filtered f
-  ),
-  ranked AS (
-    SELECT
-      d.*,
-      COUNT(*) OVER() AS total_rows
-    FROM distanced d
-    ${hasRadius ? Prisma.sql`WHERE d.distance_km <= ${radiusKm}` : Prisma.empty}
-    ${orderBySql}
-  )
-  SELECT *
-  FROM ranked
-  LIMIT ${limit} OFFSET ${skip};
+      WITH filtered AS (
+        SELECT
+          ${selectedColumns}
+        FROM "property" p
+        WHERE p."latitude" IS NOT NULL
+          AND p."longitude" IS NOT NULL
+          AND p."isDeleted" = false
+          AND p."status" = 'published'
+          ${eqFilter}
+          ${searchFilter}
+          ${bedroomsFilter}
+          ${priceFilter}
+          ${bboxFilter}
+      ),
+      distanced AS (
+        SELECT
+          f.*,
+          (6371 * acos(
+            cos(radians(${latNum}))
+            * cos(radians(f."latitude"))
+            * cos(radians(f."longitude") - radians(${lonNum}))
+            + sin(radians(${latNum})) * sin(radians(f."latitude"))
+          )) AS distance_km
+        FROM filtered f
+      ),
+      ranked AS (
+        SELECT
+          d.*,
+          COUNT(*) OVER() AS total_rows
+        FROM distanced d
+        ${
+          hasRadius
+            ? Prisma.sql`WHERE d.distance_km <= ${radiusKm}`
+            : Prisma.empty
+        }
+        ${orderBySql}  -- uses distance first, then sortBy if provided
+      )
+      SELECT *
+      FROM ranked
+      LIMIT ${limit} OFFSET ${skip};
 `;
 
     const rows = await prisma.$queryRaw<any[]>(raw);
@@ -301,6 +326,9 @@ const getAllPropertiesFromDB = async (
     return { meta: { total, page, limit }, data };
   }
 
+  console.log("sortBy", sortBy);
+  console.log("sortOrder", sortOrder);
+
   // non-geo result
   const result = await prisma.property.findMany({
     where: whereConditions,
@@ -309,6 +337,22 @@ const getAllPropertiesFromDB = async (
     orderBy: sortBy
       ? { [sortBy]: sortOrder } // safe due to whitelist above
       : { createdAt: "desc" },
+    select: {
+      id: true,
+      listingType: true,
+      propertyType: true,
+      address: true,
+      city: true,
+      state: true,
+      country: true,
+      description: true,
+      price: true,
+      bedrooms: true,
+      bathrooms: true,
+      areaSqFt: true,
+      coverImage: true,
+      status: true,
+    },
   });
 
   const total = await prisma.property.count({ where: whereConditions });
