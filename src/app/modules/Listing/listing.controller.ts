@@ -18,19 +18,23 @@ const addProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
 });
 
 const getAllProperties = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, listingFilterableFields);
-  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const filters = pick(res.locals.query, listingFilterableFields);
+  const options = pick(res.locals.query, [
+    "limit",
+    "page",
+    "sortBy",
+    "sortOrder",
+  ]);
 
   const result = await ListingService.getAllPropertiesFromDB(filters, options);
-  
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Listing added successfully!",
+    message: "Listing retrived successfully!",
     data: result,
   });
 });
-
 
 export const ListingController = {
   addProperty,

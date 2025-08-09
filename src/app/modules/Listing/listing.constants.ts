@@ -28,15 +28,40 @@ export const listingFilterableFields: string[] = [
   "internetIncluded",
   "lat",
   "lon",
-  "maxDistance",
+  "maxDistanceMeters",
 ];
 
-export const booleanFields = [
-  "hasParking",
-  "hasLift",
-  "hasBalcony",
-  "heating",
-  "cooling",
-  "petFriendly",
-  "internetIncluded",
-];
+export const ALLOWED_SORT_FIELDS = new Set(["price", "bedrooms", "createdAt"]);
+
+// export const numericFieldCandidates = [
+//   "minMonthlyRent",
+//   "maxMonthlyRent",
+//   "minBedrooms",
+//   "maxBedrooms",
+//   "availableMonthNumber",
+//   "lat",
+//   "lon",
+//   "maxDistance",
+//   "maxDistanceMeters",
+//   "page",
+//   "limit",
+// ] as const;
+
+// Which numeric fields should be integers?
+// export const integerFields: ReadonlySet<string> = new Set([
+//   "minBedrooms",
+//   "maxBedrooms",
+//   "availableMonthNumber",
+//   "page",
+//   "limit",
+// ]);
+
+// export const booleanFields = [
+//   "hasParking",
+//   "hasLift",
+//   "hasBalcony",
+//   "heating",
+//   "cooling",
+//   "petFriendly",
+//   "internetIncluded",
+// ];

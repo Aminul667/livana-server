@@ -104,7 +104,6 @@ const updateUserProfileIntoDB = async (req: IAuthRequest) => {
 
 const getMeFromDB = async (req: IAuthRequest) => {
   const userId = req.user?.userId;
-  console.log(userId);
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
