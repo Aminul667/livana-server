@@ -268,6 +268,7 @@ const getAllPropertiesFromDB = async (
       p."coverImage",
       p.latitude,
       p.longitude,
+      p."isFeatured",
       p.status
 `;
     // Build the geo query
@@ -307,7 +308,7 @@ const getAllPropertiesFromDB = async (
             ? Prisma.sql`WHERE d.distance_km <= ${radiusKm}`
             : Prisma.empty
         }
-        ${orderBySql}  -- uses distance first, then sortBy if provided
+        ${orderBySql}
       )
       SELECT *
       FROM ranked
@@ -351,6 +352,7 @@ const getAllPropertiesFromDB = async (
       bathrooms: true,
       areaSqFt: true,
       coverImage: true,
+      isFeatured: true,
       status: true,
     },
   });
