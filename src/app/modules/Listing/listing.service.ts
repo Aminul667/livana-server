@@ -362,7 +362,42 @@ const getAllPropertiesFromDB = async (
   return { meta: { total, page, limit }, data: result };
 };
 
+const getPropertyByIdFromDB = async (id: string) => {
+  const property = await prisma.property.findFirst({
+    where: {
+      id,
+      isDeleted: false,
+      status: ListingStatus.published,
+    },
+    include: {
+      images: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          email: true,
+          profile: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return property;
+};
+
 export const ListingService = {
   addPropertyIntoDB,
   getAllPropertiesFromDB,
+  getPropertyByIdFromDB,
 };

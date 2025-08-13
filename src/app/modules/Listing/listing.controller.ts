@@ -36,7 +36,20 @@ const getAllProperties = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getPropertyById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await ListingService.getPropertyByIdFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Property retrieved successfully!",
+    data: result,
+  });
+});
+
 export const ListingController = {
   addProperty,
   getAllProperties,
+  getPropertyById
 };

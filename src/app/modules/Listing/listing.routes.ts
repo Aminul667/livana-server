@@ -15,6 +15,8 @@ router.get(
   ListingController.getAllProperties
 );
 
+router.get("/:id", ListingController.getPropertyById);
+
 router.post(
   "/add",
   auth(UserRole.landlord),
