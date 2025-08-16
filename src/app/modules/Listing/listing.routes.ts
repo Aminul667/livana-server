@@ -15,6 +15,18 @@ router.get(
   ListingController.getAllProperties
 );
 
+router.get(
+  "/draft",
+  auth(UserRole.landlord),
+  ListingController.getAllDraftProperties
+);
+
+router.get(
+  "/draft/:id",
+  auth(UserRole.landlord),
+  ListingController.getDraftById
+);
+
 router.get("/:id", ListingController.getPropertyById);
 
 router.post(

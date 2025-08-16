@@ -396,8 +396,68 @@ const getPropertyByIdFromDB = async (id: string) => {
   return property;
 };
 
+const getAllDraftPropertiesFromDB = async (req: IAuthRequest) => {
+  if (!req.user) {
+    throw new Error("User information is missing.");
+  }
+
+  const userId = req.user.userId;
+
+  console.log("Get Draft property by id", userId);
+
+  const result = prisma.property.findMany({
+    where: { userId, status: ListingStatus.draft, isDeleted: false },
+  });
+
+  return result;
+};
+
+const getDraftByIdFromDB = async (req: IAuthRequest) => {
+  if (!req.user) {
+    throw new Error("User information is missing.");
+  }
+
+  const { userId } = req.user;
+  const { id } = req.params;
+
+  const result = await prisma.property.findFirst({
+    where: {
+      userId,
+      id,
+      isDeleted: false,
+      status: ListingStatus.draft,
+    },
+    include: {
+      images: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          email: true,
+          profile: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 export const ListingService = {
   addPropertyIntoDB,
   getAllPropertiesFromDB,
   getPropertyByIdFromDB,
+  getAllDraftPropertiesFromDB,
+  getDraftByIdFromDB,
 };

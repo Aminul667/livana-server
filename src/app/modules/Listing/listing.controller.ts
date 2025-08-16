@@ -48,8 +48,33 @@ const getPropertyById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllDraftProperties = catchAsync(
+  async (req: IAuthRequest, res: Response) => {
+    const result = await ListingService.getAllDraftPropertiesFromDB(req);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Draft property retrieved successfully!",
+      data: result,
+    });
+  }
+);
+
+const getDraftById = catchAsync(async (req: IAuthRequest, res: Response) => {
+  const result = await ListingService.getDraftByIdFromDB(req);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Draft property retrieved successfully!",
+    data: result,
+  });
+});
+
 export const ListingController = {
   addProperty,
   getAllProperties,
-  getPropertyById
+  getPropertyById,
+  getAllDraftProperties,
+  getDraftById,
 };
