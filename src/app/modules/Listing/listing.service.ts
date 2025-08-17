@@ -403,10 +403,8 @@ const getAllDraftPropertiesFromDB = async (req: IAuthRequest) => {
 
   const userId = req.user.userId;
 
-  console.log("Get Draft property by id", userId);
-
   const result = prisma.property.findMany({
-    where: { userId, status: ListingStatus.draft, isDeleted: false },
+    where: { userId, isDeleted: false },
   });
 
   return result;
@@ -425,7 +423,6 @@ const getDraftByIdFromDB = async (req: IAuthRequest) => {
       userId,
       id,
       isDeleted: false,
-      status: ListingStatus.draft,
     },
     include: {
       images: {
