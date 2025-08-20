@@ -7,6 +7,7 @@ export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
+  stripe_client_secret: process.env.STRIPE_CLIENT_SECRET,
   jwt: {
     jwt_secret: process.env.JWT_SECRET,
     expires_in: process.env.EXPIRES_IN,

@@ -25,6 +25,7 @@ model User {
   updatedAt          DateTime      @updatedAt
   profile            Profile?
   property           Property[]
+  payment            Payment[]
 
   @@map("users")
 }
@@ -99,9 +100,16 @@ model Property {
   images PropertyImage[] // relation to image model
   user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  payment   Payment[]
 
+  @@index([userId])
+  @@index([latitude])
+  @@index([longitude])
+  @@index([price])
+  @@index([bedrooms])
+  @@index([isDeleted, status, createdAt])
   @@map("property")
 }
 
@@ -114,6 +122,25 @@ model PropertyImage {
   createdAt DateTime @default(now())
 
   @@map("property_image")
+}
+
+model Payment {
+  id            String  @id @default(uuid())
+  userId        String
+  propertyId    String?
+  type          String
+  amount        Float
+  transactionId String
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([type])
+  @@map("payment")
 }
 
 enum UserRole {
