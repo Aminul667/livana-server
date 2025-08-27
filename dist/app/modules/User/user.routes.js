@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const user_controller_1 = require("./user.controller");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const client_1 = require("@prisma/client");
+const multer_config_1 = require("../../../config/multer.config");
+const parseJSONBody_1 = require("../../middlewares/parseJSONBody");
+const router = express_1.default.Router();
+router.get("/", user_controller_1.userController.getAllUsers);
+// router.get("/:id", userController.getUserById);
+router.get("/me", (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.landlord, client_1.UserRole.tenant), user_controller_1.userController.getMe);
+router.get("/:id", user_controller_1.userController.getUserById);
+router.post("/create-user", user_controller_1.userController.createUser);
+router.post("/update-profile", (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.landlord, client_1.UserRole.tenant), multer_config_1.multerUpload.single("profilePhoto"), (0, parseJSONBody_1.parseJSONBody)("data"), user_controller_1.userController.updateUserProfile);
+exports.UserRoutes = router;

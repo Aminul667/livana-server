@@ -37,7 +37,7 @@ const updateUserProfile = catchAsync(
       statusCode: httpStatus.OK,
       success: true,
       message: "User profile updated successfully!",
-      data: result,
+      data: {accessToken, refreshToken},
     });
   }
 );
@@ -52,8 +52,32 @@ const getMe = catchAsync(async (req: IAuthRequest, res: Response) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.getAllUsersFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Users retrieved successfully!",
+    data: result,
+  });
+});
+
+const getUserById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await userService.getUserByIdFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User retrieved successfully!",
+    data: result,
+  });
+});
+
 export const userController = {
   createUser,
   updateUserProfile,
   getMe,
+  getAllUsers,
+  getUserById,
 };

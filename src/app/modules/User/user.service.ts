@@ -3,7 +3,6 @@ import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { IAuthRequest, IUser } from "./user.interface";
-import { AuthServices } from "../Auth/auth.service";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import config from "../../../config";
 
@@ -128,8 +127,55 @@ const getMeFromDB = async (req: IAuthRequest) => {
   return user;
 };
 
+const getAllUsersFromDB = async () => {
+  const result = prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          phone: true,
+          location: true,
+          about: true,
+          profilePhoto: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const getUserByIdFromDB = async (id: string) => {
+  const result = await prisma.user.findFirst({
+    where: { id, isDeleted: false },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          phone: true,
+          location: true,
+          about: true,
+          profilePhoto: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 export const userService = {
   createUserIntoDB,
   updateUserProfileIntoDB,
   getMeFromDB,
+  getAllUsersFromDB,
+  getUserByIdFromDB,
 };

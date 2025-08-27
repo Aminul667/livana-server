@@ -7,11 +7,17 @@ import { parseJSONBody } from "../../middlewares/parseJSONBody";
 
 const router = express.Router();
 
+router.get("/", userController.getAllUsers);
+
+// router.get("/:id", userController.getUserById);
+
 router.get(
   "/me",
   auth(UserRole.admin, UserRole.landlord, UserRole.tenant),
   userController.getMe
 );
+
+router.get("/:id", userController.getUserById);
 
 router.post("/create-user", userController.createUser);
 

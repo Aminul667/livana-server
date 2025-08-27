@@ -16,7 +16,6 @@
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/jsonwebtoken": "^9.0.2",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.1.0",
     "@types/nodemailer": "^6.4.17",
@@ -27,6 +26,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.13.0",
+    "@types/jsonwebtoken": "9.0.2",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
@@ -41,6 +41,6 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.5",
     "stripe": "^18.4.0",
-    "zod": "^4.0.14"
+    "zod": "^4.1.3"
   }
 }

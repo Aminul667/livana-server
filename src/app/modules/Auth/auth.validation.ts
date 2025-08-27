@@ -2,15 +2,17 @@ import { z } from "zod";
 
 const loginValidationSchema = z.object({
   body: z.object({
-    email: z.string({ required_error: "Email is required." }),
-    password: z.string({ required_error: "Password is required" }),
+    email: z.string({ message: "Email is required." }).email("Invalid email."),
+    password: z
+      .string({ message: "Password is required." })
+      .min(1, "Password is required."),
   }),
 });
 
 const loginSocialMediaValidationSchema = z.object({
   body: z.object({
-    email: z.string({ required_error: "Email is required." }),
-    profilePhoto: z.string().optional(),
+    email: z.string({ message: "Email is required." }).email("Invalid email."),
+    profilePhoto: z.string().url("profilePhoto must be a valid URL").optional(),
     provider: z.string().optional(),
   }),
 });
@@ -18,8 +20,4 @@ const loginSocialMediaValidationSchema = z.object({
 export const AuthValidation = {
   loginValidationSchema,
   loginSocialMediaValidationSchema,
-  //   refreshTokenValidationSchema,
-  //   forgetPasswordValidationSchema,
-  //   changePasswordValidationSchema,
-  //   resetPasswordValidationSchema,
 };

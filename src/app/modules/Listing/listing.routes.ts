@@ -3,7 +3,6 @@ import { UserRole } from "@prisma/client";
 import auth from "../../middlewares/auth";
 import { multerUpload } from "../../../config/multer.config";
 import { ListingController } from "./listing.controller";
-import { parseJSONBody } from "../../middlewares/parseJSONBody";
 import { validateQuery } from "../../middlewares/validateQuery";
 import { listQuerySchema } from "./listing.validation";
 
