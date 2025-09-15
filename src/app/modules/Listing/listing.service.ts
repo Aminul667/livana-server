@@ -8,6 +8,7 @@ import {
   listingSearchableFields,
 } from "./listing.constants";
 import { paginationHelper } from "../../../helpers/paginationHelper";
+import { TPropertyFor } from "./listing.interface";
 
 const addPropertyIntoDB = async (req: IAuthRequest) => {
   if (!req.user) {
@@ -451,10 +452,17 @@ const getDraftByIdFromDB = async (req: IAuthRequest) => {
   return result;
 };
 
+// multi step
+const savePropertyIntoDB = async (userId: string, payload: TPropertyFor) => {
+  console.log("Save property", userId);
+  console.log("Save payload", payload);
+};
+
 export const ListingService = {
   addPropertyIntoDB,
   getAllPropertiesFromDB,
   getPropertyByIdFromDB,
   getAllDraftPropertiesFromDB,
   getDraftByIdFromDB,
+  savePropertyIntoDB,
 };

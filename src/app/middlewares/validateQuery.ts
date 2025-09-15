@@ -21,7 +21,7 @@ export function validateQuery<S extends ZodObject<ZodRawShape>>(
       });
     }
 
-    res.locals.query = parsed.data; // ✅ stash validated/coerced query here
+    res.locals.query = parsed.data;
     next();
   };
 }

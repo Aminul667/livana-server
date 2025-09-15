@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req: Request, res: Response) => {
   res.send({
-    message: "Setup Server...",
+    message: "Livana Server is running...",
   });
 });
 

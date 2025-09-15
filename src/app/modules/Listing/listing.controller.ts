@@ -6,6 +6,7 @@ import httpStatus from "http-status";
 import { ListingService } from "./listing.service";
 import pick from "../../../shared/pick";
 import { listingFilterableFields } from "./listing.constants";
+import ApiError from "../../errors/ApiErrors";
 
 const addProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
   const result = await ListingService.addPropertyIntoDB(req);
@@ -71,10 +72,30 @@ const getDraftById = catchAsync(async (req: IAuthRequest, res: Response) => {
   });
 });
 
+// multi step form
+const saveProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
+  const userId = req.user?.userId;
+  const payload = req.body;
+
+  if (!userId) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User is not included");
+  }
+
+  const result = await ListingService.savePropertyIntoDB(userId, payload);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Listing has been saved successfully!",
+    data: result,
+  });
+});
+
 export const ListingController = {
   addProperty,
   getAllProperties,
   getPropertyById,
   getAllDraftProperties,
   getDraftById,
+  saveProperty,
 };

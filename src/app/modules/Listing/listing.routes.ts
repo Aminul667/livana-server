@@ -28,6 +28,8 @@ router.get(
 
 router.get("/:id", ListingController.getPropertyById);
 
+router.post("/save", auth(UserRole.landlord), ListingController.saveProperty);
+
 router.post(
   "/add",
   auth(UserRole.landlord),

@@ -20,7 +20,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
     res.send({
-        message: "Setup Server...",
+        message: "Livana Server is running...",
     });
 });
 app.use("/api/v1", routes_1.default);

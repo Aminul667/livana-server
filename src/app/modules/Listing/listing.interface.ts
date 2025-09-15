@@ -40,3 +40,7 @@ export type TProperty = {
   internetIncluded: boolean;
   videoUrl?: string;
 };
+
+export type TPropertyFor = {
+  propertyFor: string;
+}
