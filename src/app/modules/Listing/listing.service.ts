@@ -9,6 +9,8 @@ import {
 } from "./listing.constants";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import { TPropertyFor } from "./listing.interface";
+import ApiError from "../../errors/ApiErrors";
+import httpStatus from "http-status";
 
 const addPropertyIntoDB = async (req: IAuthRequest) => {
   if (!req.user) {
@@ -454,8 +456,24 @@ const getDraftByIdFromDB = async (req: IAuthRequest) => {
 
 // multi step
 const savePropertyIntoDB = async (userId: string, payload: TPropertyFor) => {
-  console.log("Save property", userId);
-  console.log("Save payload", payload);
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const propertyData = {
+    userId: existingUser.id,
+    ...payload,
+  };
+
+  const result = await prisma.listing.create({
+    data: propertyData,
+  });
+
+  return result;
 };
 
 export const ListingService = {

@@ -124,6 +124,8 @@ model Listing {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   listingProgress ListingProgress?
+
+  @@map("listing")
 }
 
 model ListingProgress {
@@ -137,6 +139,8 @@ model ListingProgress {
 
   // relation
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("listing_progress")
 }
 
 model PropertyImage {

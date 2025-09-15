@@ -1,6 +1,7 @@
 import {
   FurnishedStatus,
   ListingStatus,
+  PropertyFor,
   PropertyType,
   Purpose,
   RentFrequency,
@@ -42,5 +43,5 @@ export type TProperty = {
 };
 
 export type TPropertyFor = {
-  propertyFor: string;
-}
+  propertyFor: PropertyFor;
+};
