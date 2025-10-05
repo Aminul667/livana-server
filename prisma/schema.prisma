@@ -27,6 +27,8 @@ model User {
   property           Property[]
   payment            Payment[]
   listing            Listing[]
+  sentMessages       Message[]     @relation("SentMessages")
+  receivedMessages   Message[]     @relation("ReceivedMessages")
 
   @@map("users")
 }
@@ -121,8 +123,48 @@ model Listing {
 
   propertyFor PropertyFor?
 
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  // details
+  listingType          ListingType?
+  bedrooms             Int?
+  bathrooms            Int?
+  areaSqFt             Float?
+  floorNumber          Int?
+  totalFloors          Int? // optional in Zod
+  furnished            FurnishedStatus?
+  coverImage           String?
+  availableFrom        String?
+  availableMonth       String?
+  availableMonthNumber Int?
+
+  // Location
+  address    String?
+  city       String?
+  state      String?
+  postalCode String?
+  country    String?
+  latitude   Float? // optional in Zod
+  longitude  Float? // optional in Zod
+
+  // Features
+  amenities        String[]
+  hasParking       Boolean  @default(false)
+  hasLift          Boolean  @default(false)
+  hasBalcony       Boolean  @default(false)
+  heating          Boolean  @default(false)
+  cooling          Boolean  @default(false)
+  petFriendly      Boolean  @default(false)
+  internetIncluded Boolean  @default(false)
+
+  // Rent Specific
+  monthlyRent    Float?
+  weeklyRent     Float?
+  rentFrequency  RentFrequency?
+  depositAmount  Float?
+  maintenanceFee Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   listingProgress ListingProgress?
 
   @@map("listing")
@@ -171,6 +213,20 @@ model Payment {
   @@index([propertyId])
   @@index([type])
   @@map("payment")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  text       String?  @db.VarChar(2000)
+  image      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // --- Relations ---
+  sender   User @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
 }
 
 enum UserRole {
