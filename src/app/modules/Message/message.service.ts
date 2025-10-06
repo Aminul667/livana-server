@@ -44,13 +44,68 @@ const getAllContactsFromDB = async (loggedInUserId: string) => {
       id: {
         not: loggedInUserId,
       },
+      isDeleted: false,
+    },
+    select: {
+      id: true,
+      email: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
     },
   });
 
   return filteredUsers;
 };
 
+const getChatListFromDB = async (userId: string) => {
+  // Find all messages where the logged-in user is sender or receiver
+  const messages = await prisma.message.findMany({
+    where: {
+      OR: [{ senderId: userId }, { receiverId: userId }],
+    },
+    select: {
+      senderId: true,
+      receiverId: true,
+    },
+  });
+
+  // Extract unique partner IDs
+  const chatPartnerIds = [
+    ...new Set(
+      messages.map((msg) =>
+        msg.senderId === userId ? msg.receiverId : msg.senderId
+      )
+    ),
+  ].filter(Boolean);
+
+  const chatPartners = await prisma.user.findMany({
+    where: {
+      id: { in: chatPartnerIds },
+    },
+    select: {
+      id: true,
+      email: true,
+      createdAt: true,
+      updatedAt: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          profilePhoto: true,
+        },
+      },
+    },
+  });
+
+  return chatPartners;
+};
+
 export const MessageService = {
   sendMessage,
   getAllContactsFromDB,
+  getChatListFromDB,
 };
