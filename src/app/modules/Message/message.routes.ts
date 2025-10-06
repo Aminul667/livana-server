@@ -17,6 +17,12 @@ router.get(
   MessageController.getChatList
 );
 
+router.get(
+  "/:id",
+  auth(UserRole.admin, UserRole.landlord, UserRole.tenant),
+  MessageController.getMessageByUserId
+);
+
 router.post(
   "/send/:id",
   auth(UserRole.admin, UserRole.landlord, UserRole.tenant),

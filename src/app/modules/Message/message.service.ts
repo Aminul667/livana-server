@@ -104,8 +104,33 @@ const getChatListFromDB = async (userId: string) => {
   return chatPartners;
 };
 
+const getMessageByUserId = async (
+  loggedInUserId: string,
+  userToChatId: string
+) => {
+  // Find all messages between the two users (both directions)
+  const messages = await prisma.message.findMany({
+    where: {
+      OR: [
+        {
+          AND: [{ senderId: loggedInUserId }, { receiverId: userToChatId }],
+        },
+        {
+          AND: [{ senderId: userToChatId }, { receiverId: loggedInUserId }],
+        },
+      ],
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  return messages;
+};
+
 export const MessageService = {
   sendMessage,
   getAllContactsFromDB,
   getChatListFromDB,
+  getMessageByUserId,
 };

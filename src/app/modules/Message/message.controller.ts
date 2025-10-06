@@ -59,8 +59,29 @@ const getChatList = catchAsync(async (req: IAuthRequest, res: Response) => {
   });
 });
 
+const getMessageByUserId = catchAsync(
+  async (req: IAuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const { id } = req.params;
+
+    if (!userId) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User is not included");
+    }
+
+    const result = await MessageService.getMessageByUserId(userId, id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Chats have been retrieved successfully!",
+      data: result,
+    });
+  }
+);
+
 export const MessageController = {
   sendMessage,
   getAllContacts,
   getChatList,
+  getMessageByUserId,
 };
