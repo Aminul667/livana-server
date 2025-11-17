@@ -6,6 +6,7 @@ import {
   Purpose,
   RentFrequency,
 } from "@prisma/client";
+import { number } from "zod";
 
 export type TImageFiles = { [fieldname: string]: Express.Multer.File[] };
 
@@ -44,4 +45,14 @@ export type TProperty = {
 
 export type TPropertyFor = {
   propertyFor: PropertyFor;
+};
+
+export type TListingDetails = {
+  bedrooms: number;
+  bathrooms: number;
+  areaSqFt: number;
+  floorNumber: number;
+  totalFloors?: number;
+  furnished: FurnishedStatus;
+  availableFrom: string;
 };

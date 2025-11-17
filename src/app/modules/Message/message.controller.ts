@@ -5,17 +5,42 @@ import ApiError from "../../errors/ApiErrors";
 import { MessageService } from "./message.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
+import { getReceiverSocketId, io } from "../../../socket";
 
 const sendMessage = catchAsync(async (req: IAuthRequest, res: Response) => {
   const senderId = req.user?.userId;
-  const { id } = req.params;
+  const { id: receiverId } = req.params;
   const payload = req.body;
 
   if (!senderId) {
     throw new ApiError(httpStatus.NOT_FOUND, "User is not included");
   }
 
-  const result = await MessageService.sendMessage(senderId, id, payload);
+  const result = await MessageService.sendMessage(
+    senderId,
+    receiverId,
+    payload
+  );
+
+  // ✅ After message saved, emit via socket
+  const receiverSocketId = getReceiverSocketId(receiverId);
+  const senderSocketId = getReceiverSocketId(senderId);
+
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("new_message", result);
+  }
+
+  // Optionally emit to sender (for UI confirmation)
+  if (senderSocketId) {
+    io.to(senderSocketId).emit("new_message", result);
+  }
+
+  // ✅ Debug log (add it HERE)
+  console.log("📤 Emitted new_message to:", {
+    receiverSocketId,
+    senderSocketId,
+    messageId: result.id,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

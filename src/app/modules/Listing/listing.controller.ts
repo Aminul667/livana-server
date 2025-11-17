@@ -91,6 +91,31 @@ const saveProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
   });
 });
 
+const addListingDetails = catchAsync(
+  async (req: IAuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const payload = req.body;
+    const listingId = req.params.id;
+
+    if (!userId) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User is not included");
+    }
+
+    const result = await ListingService.addListingDetailsIntoDB(
+      payload,
+      userId,
+      listingId
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Listing Details have been saved successfully!",
+      data: result,
+    });
+  }
+);
+
 export const ListingController = {
   addProperty,
   getAllProperties,
@@ -98,4 +123,5 @@ export const ListingController = {
   getAllDraftProperties,
   getDraftById,
   saveProperty,
+  addListingDetails
 };

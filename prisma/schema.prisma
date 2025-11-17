@@ -121,10 +121,9 @@ model Listing {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  propertyFor PropertyFor?
-
-  // details
   listingType          ListingType?
+  
+  // details
   bedrooms             Int?
   bathrooms            Int?
   areaSqFt             Float?

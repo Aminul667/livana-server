@@ -4,7 +4,12 @@ import auth from "../../middlewares/auth";
 import { multerUpload } from "../../../config/multer.config";
 import { ListingController } from "./listing.controller";
 import { validateQuery } from "../../middlewares/validateQuery";
-import { listQuerySchema } from "./listing.validation";
+import {
+  listingDetailsValidationSchema,
+  listingTypeSchema,
+  listQuerySchema,
+} from "./listing.validation";
+import validateRequest from "../../middlewares/validateRequest";
 
 const router = express.Router();
 
@@ -28,7 +33,19 @@ router.get(
 
 router.get("/:id", ListingController.getPropertyById);
 
-router.post("/save", auth(UserRole.landlord), ListingController.saveProperty);
+router.post(
+  "/drafts",
+  auth(UserRole.landlord),
+  validateRequest(listingTypeSchema),
+  ListingController.saveProperty
+);
+
+router.patch(
+  "/drafts/:id",
+  auth(UserRole.landlord),
+  validateRequest(listingDetailsValidationSchema),
+  ListingController.addListingDetails
+);
 
 router.post(
   "/add",
@@ -40,5 +57,11 @@ router.post(
   },
   ListingController.addProperty
 );
+
+// router.post(
+//   "/drafts",
+//   auth(UserRole.LANDLORD, UserRole.ADMIN),
+//   ListingController.saveListing
+// );
 
 export const ListingRoutes = router;

@@ -2,7 +2,6 @@
 import z from "zod";
 import {
   FurnishedStatus,
-  ListingStatus,
   ListingType,
   PropertyType,
   Purpose,
@@ -102,3 +101,29 @@ export const listQuerySchemaWithDerived = listQuerySchema.transform((v) => ({
     v.maxDistanceMeters ??
     (typeof v.maxDistance === "number" ? v.maxDistance * 1000 : undefined),
 }));
+
+export const listingTypeSchema = z.object({
+  body: z.object({
+    listingType: zFromPrismaEnum(ListingType).refine(
+      (val) => val === ListingType.rent || val === ListingType.sale,
+      { message: "Listing Type must be either 'rent' or 'sale'" }
+    ),
+  }),
+});
+
+export const listingDetailsValidationSchema = z.object({
+  body: z.object({
+    bedrooms: z.number().positive("bedrooms must be greater than 0"),
+    bathrooms: z.number().positive("bathrooms must be greater than 0"),
+    areaSqFt: z.number().positive("size must be greater than 0"),
+    floorNumber: z.number().positive("floorNumber must be greater than 0"),
+    totalFloors: z
+      .number()
+      .positive("totalFloors must be greater than 0")
+      .optional(),
+    furnished: zFromPrismaEnum(FurnishedStatus),
+    availableFrom: z.string().refine((dateStr) => !isNaN(Date.parse(dateStr)), {
+      message: "Invalid date format for availableFrom",
+    }),
+  }),
+});

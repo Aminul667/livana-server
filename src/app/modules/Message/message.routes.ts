@@ -17,6 +17,7 @@ router.get(
   MessageController.getChatList
 );
 
+// receiverId
 router.get(
   "/:id",
   auth(UserRole.admin, UserRole.landlord, UserRole.tenant),

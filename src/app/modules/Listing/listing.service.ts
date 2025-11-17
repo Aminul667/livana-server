@@ -8,7 +8,7 @@ import {
   listingSearchableFields,
 } from "./listing.constants";
 import { paginationHelper } from "../../../helpers/paginationHelper";
-import { TPropertyFor } from "./listing.interface";
+import { TListingDetails, TPropertyFor } from "./listing.interface";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 
@@ -469,11 +469,94 @@ const savePropertyIntoDB = async (userId: string, payload: TPropertyFor) => {
     ...payload,
   };
 
-  const result = await prisma.listing.create({
-    data: propertyData,
+  const result = await prisma.$transaction(async (tx) => {
+    const listing = await tx.listing.create({
+      data: propertyData,
+      select: { id: true, listingType: true, createdAt: true, updatedAt: true },
+    });
+
+    await tx.listingProgress.create({
+      data: { listingId: listing.id, currentStep: 1, isCompleted: false },
+    });
+
+    return listing;
   });
 
   return result;
+};
+
+const addListingDetailsIntoDB = async (
+  payload: TListingDetails,
+  userId: string,
+  listingId: string
+) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User doesn't exist");
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: {
+      id: listingId,
+    },
+  });
+
+  if (!listing) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Listing not found");
+  }
+
+  const currentStep = await prisma.listingProgress.findUnique({
+    where: { listingId },
+  });
+
+  const { availableFrom } = payload;
+
+  const { availableMonth, availableMonthNumber } =
+    extractMonthInfo(availableFrom);
+
+  const updatedPayload = {
+    ...payload,
+    availableMonth,
+    availableMonthNumber,
+  };
+
+  const resultData = await prisma.$transaction(async (tx) => {
+    const details = await tx.listing.update({
+      where: { id: listingId },
+      data: updatedPayload,
+      select: {
+        id: true,
+        bedrooms: true,
+        bathrooms: true,
+        areaSqFt: true,
+        floorNumber: true,
+        totalFloors: true,
+        furnished: true,
+        availableFrom: true,
+        availableMonth: true,
+        availableMonthNumber: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (currentStep && currentStep.currentStep < 2) {
+      await tx.listingProgress.update({
+        where: { listingId },
+        data: {
+          currentStep: 2,
+          isCompleted: false,
+        },
+      });
+    }
+
+    return details;
+  });
+
+  return resultData;
 };
 
 export const ListingService = {
@@ -483,4 +566,5 @@ export const ListingService = {
   getAllDraftPropertiesFromDB,
   getDraftByIdFromDB,
   savePropertyIntoDB,
+  addListingDetailsIntoDB,
 };
