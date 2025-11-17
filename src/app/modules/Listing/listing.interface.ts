@@ -56,3 +56,13 @@ export type TListingDetails = {
   furnished: FurnishedStatus;
   availableFrom: string;
 };
+
+export type TLocationDetails = {
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+};

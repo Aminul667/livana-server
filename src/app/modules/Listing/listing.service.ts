@@ -8,7 +8,11 @@ import {
   listingSearchableFields,
 } from "./listing.constants";
 import { paginationHelper } from "../../../helpers/paginationHelper";
-import { TListingDetails, TPropertyFor } from "./listing.interface";
+import {
+  TListingDetails,
+  TLocationDetails,
+  TPropertyFor,
+} from "./listing.interface";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 
@@ -559,6 +563,67 @@ const addListingDetailsIntoDB = async (
   return resultData;
 };
 
+const addLocationDetailsIntoDB = async (
+  payload: TLocationDetails,
+  userId: string,
+  listingId: string
+) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User doesn't exist");
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: {
+      id: listingId,
+    },
+  });
+
+  if (!listing) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Listing not found");
+  }
+
+  const currentStep = await prisma.listingProgress.findUnique({
+    where: { listingId },
+  });
+
+  const result = await prisma.$transaction(async (tx) => {
+    const locationDetails = await tx.listing.update({
+      where: { id: listingId },
+      data: payload,
+      select: {
+        id: true,
+        address: true,
+        city: true,
+        state: true,
+        postalCode: true,
+        country: true,
+        latitude: true,
+        longitude: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (currentStep && currentStep.currentStep < 3) {
+      await tx.listingProgress.update({
+        where: { listingId },
+        data: {
+          currentStep: 3,
+          isCompleted: false,
+        },
+      });
+    }
+
+    return locationDetails;
+  });
+
+  return result;
+};
+
 export const ListingService = {
   addPropertyIntoDB,
   getAllPropertiesFromDB,
@@ -567,4 +632,5 @@ export const ListingService = {
   getDraftByIdFromDB,
   savePropertyIntoDB,
   addListingDetailsIntoDB,
+  addLocationDetailsIntoDB,
 };

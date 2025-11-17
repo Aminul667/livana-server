@@ -8,6 +8,7 @@ import {
   listingDetailsValidationSchema,
   listingTypeSchema,
   listQuerySchema,
+  locationDetailsValidationSchema,
 } from "./listing.validation";
 import validateRequest from "../../middlewares/validateRequest";
 
@@ -41,10 +42,17 @@ router.post(
 );
 
 router.patch(
-  "/drafts/:id",
+  "/drafts/details/:id",
   auth(UserRole.landlord),
   validateRequest(listingDetailsValidationSchema),
   ListingController.addListingDetails
+);
+
+router.patch(
+  "/drafts/location/:id",
+  auth(UserRole.landlord),
+  validateRequest(locationDetailsValidationSchema),
+  ListingController.addLocationDetails
 );
 
 router.post(

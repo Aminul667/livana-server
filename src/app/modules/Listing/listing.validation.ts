@@ -127,3 +127,21 @@ export const listingDetailsValidationSchema = z.object({
     }),
   }),
 });
+
+export const locationDetailsValidationSchema = z.object({
+  body: z.object({
+    address: z.string().min(1, "address is required"),
+    city: z.string().min(1, "city is required"),
+    state: z.string().min(1, "state is required"),
+    postalCode: z.string().min(1, "postalCode is required"),
+    country: z.string().min(1, "country is required"),
+    latitude: z
+      .number()
+      .min(-90)
+      .max(90, "latitude must be between -90 and 90"),
+    longitude: z
+      .number()
+      .min(-180)
+      .max(180, "longitude must be between -180 and 180"),
+  }),
+});
