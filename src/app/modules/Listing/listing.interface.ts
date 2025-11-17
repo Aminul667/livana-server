@@ -66,3 +66,21 @@ export type TLocationDetails = {
   latitude: number;
   longitude: number;
 };
+
+export type TFeaturesAndAmenities = {
+  hasParking: boolean;
+  hasLift: boolean;
+  hasBalcony: boolean;
+  heating: boolean;
+  cooling: boolean;
+  petFriendly: boolean;
+  internetIncluded: boolean;
+};
+
+export type TRentalDetails = {
+  monthlyRent: number;
+  weeklyRent: number;
+  rentFrequency: RentFrequency;
+  depositAmount: number;
+  maintenanceFee: number;
+};

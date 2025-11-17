@@ -31,3 +31,13 @@ export const listingFilterableFields: string[] = [
 ];
 
 export const ALLOWED_SORT_FIELDS = new Set(["price", "bedrooms", "createdAt"]);
+
+export const FEATURE_LABELS = {
+  hasParking: "Parking Available",
+  hasLift: "Lift Available",
+  hasBalcony: "Balcony Available",
+  heating: "Heating",
+  cooling: "Cooling",
+  petFriendly: "Pet Friendly",
+  internetIncluded: "Internet Included",
+} as const;

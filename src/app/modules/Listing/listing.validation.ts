@@ -145,3 +145,27 @@ export const locationDetailsValidationSchema = z.object({
       .max(180, "longitude must be between -180 and 180"),
   }),
 });
+
+export const featuresAndAmenitiesValidationSchema = z.object({
+  body: z.object({
+    hasParking: z.boolean(),
+    hasLift: z.boolean(),
+    hasBalcony: z.boolean(),
+    heating: z.boolean(),
+    cooling: z.boolean(),
+    petFriendly: z.boolean(),
+    internetIncluded: z.boolean(),
+  }),
+});
+
+export const rentalDetailsValidationSchema = z.object({
+  body: z.object({
+    rentFrequency: zFromPrismaEnum(RentFrequency),
+    depositAmount: z.number().nonnegative("Deposit amount cannot be negative"),
+    maintenanceFee: z
+      .number()
+      .nonnegative("Maintenance fee cannot be negative"),
+    monthlyRent: z.number().nonnegative("Monthly rent cannot be negative"),
+    weeklyRent: z.number().nonnegative("Weekly rent cannot be negative"),
+  }),
+});

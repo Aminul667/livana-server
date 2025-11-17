@@ -5,13 +5,16 @@ import { IAuthRequest } from "../User/user.interface";
 import { extractMonthInfo } from "./listing.utils";
 import {
   ALLOWED_SORT_FIELDS,
+  FEATURE_LABELS,
   listingSearchableFields,
 } from "./listing.constants";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import {
+  TFeaturesAndAmenities,
   TListingDetails,
   TLocationDetails,
   TPropertyFor,
+  TRentalDetails,
 } from "./listing.interface";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
@@ -624,6 +627,139 @@ const addLocationDetailsIntoDB = async (
   return result;
 };
 
+const addFeaturesAndAmenitiesIntoDB = async (
+  payload: TFeaturesAndAmenities,
+  userId: string,
+  listingId: string
+) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User doesn't exist");
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: {
+      id: listingId,
+    },
+  });
+
+  if (!listing) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Listing not found");
+  }
+
+  const currentStep = await prisma.listingProgress.findUnique({
+    where: { listingId },
+  });
+
+  let amenitiesList: string[] = [];
+  if (payload) {
+    amenitiesList = Object.entries(payload)
+      .filter(([_, value]) => value)
+      .map(([key]) => FEATURE_LABELS[key as keyof typeof FEATURE_LABELS]);
+  }
+
+  const updatedAmenities = {
+    ...payload,
+    amenities: amenitiesList,
+  };
+
+  const result = await prisma.$transaction(async (tx) => {
+    const features = await tx.listing.update({
+      where: { id: listingId },
+      data: updatedAmenities,
+      select: {
+        id: true,
+        hasParking: true,
+        hasLift: true,
+        hasBalcony: true,
+        heating: true,
+        cooling: true,
+        petFriendly: true,
+        internetIncluded: true,
+        amenities: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (currentStep && currentStep.currentStep < 4) {
+      await tx.listingProgress.update({
+        where: { listingId },
+        data: {
+          currentStep: 4,
+          isCompleted: true,
+        },
+      });
+    }
+
+    return features;
+  });
+
+  return result;
+};
+
+const addRentalDetailsIntoDB = async (
+  payload: TRentalDetails,
+  userId: string,
+  listingId: string
+) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User doesn't exist");
+  }
+
+  const listing = await prisma.listing.findUnique({
+    where: {
+      id: listingId,
+    },
+  });
+
+  if (!listing) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Listing not found");
+  }
+
+  const currentStep = await prisma.listingProgress.findUnique({
+    where: { listingId },
+  });
+
+  const result = await prisma.$transaction(async (tx) => {
+    const rentalDetails = await tx.listing.update({
+      where: { id: listingId },
+      data: payload,
+      select: {
+        id: true,
+        monthlyRent: true,
+        weeklyRent: true,
+        rentFrequency: true,
+        depositAmount: true,
+        maintenanceFee: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (currentStep && currentStep.currentStep < 5) {
+      await tx.listingProgress.update({
+        where: { listingId },
+        data: {
+          currentStep: 5,
+          isCompleted: true,
+        },
+      });
+    }
+
+    return rentalDetails;
+  });
+
+  return result;
+};
+
 export const ListingService = {
   addPropertyIntoDB,
   getAllPropertiesFromDB,
@@ -633,4 +769,6 @@ export const ListingService = {
   savePropertyIntoDB,
   addListingDetailsIntoDB,
   addLocationDetailsIntoDB,
+  addFeaturesAndAmenitiesIntoDB,
+  addRentalDetailsIntoDB,
 };

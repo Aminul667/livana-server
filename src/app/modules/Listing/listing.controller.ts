@@ -138,6 +138,50 @@ const addLocationDetails = catchAsync(
   }
 );
 
+const addFeaturesAndAmenities = catchAsync(
+  async (req: IAuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const payload = req.body;
+    const listingId = req.params.id;
+    if (!userId) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User is not included");
+    }
+    const result = await ListingService.addFeaturesAndAmenitiesIntoDB(
+      payload,
+      userId,
+      listingId
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Features and Amenities have been saved successfully!",
+      data: result,
+    });
+  }
+);
+
+const addRentalDetails = catchAsync(
+  async (req: IAuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+    const payload = req.body;
+    const listingId = req.params.id;
+    if (!userId) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User is not included");
+    }
+    const result = await ListingService.addRentalDetailsIntoDB(
+      payload,
+      userId,
+      listingId
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Rental Details have been saved successfully!",
+      data: result,
+    });
+  }
+);
+
 export const ListingController = {
   addProperty,
   getAllProperties,
@@ -147,4 +191,6 @@ export const ListingController = {
   saveProperty,
   addListingDetails,
   addLocationDetails,
+  addFeaturesAndAmenities,
+  addRentalDetails,
 };

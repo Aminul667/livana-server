@@ -5,10 +5,12 @@ import { multerUpload } from "../../../config/multer.config";
 import { ListingController } from "./listing.controller";
 import { validateQuery } from "../../middlewares/validateQuery";
 import {
+  featuresAndAmenitiesValidationSchema,
   listingDetailsValidationSchema,
   listingTypeSchema,
   listQuerySchema,
   locationDetailsValidationSchema,
+  rentalDetailsValidationSchema,
 } from "./listing.validation";
 import validateRequest from "../../middlewares/validateRequest";
 
@@ -53,6 +55,20 @@ router.patch(
   auth(UserRole.landlord),
   validateRequest(locationDetailsValidationSchema),
   ListingController.addLocationDetails
+);
+
+router.patch(
+  "/drafts/features-amenities/:id",
+  auth(UserRole.landlord),
+  validateRequest(featuresAndAmenitiesValidationSchema),
+  ListingController.addFeaturesAndAmenities
+);
+
+router.patch(
+  "/drafts/rental-details/:id",
+  auth(UserRole.landlord),
+  validateRequest(rentalDetailsValidationSchema),
+  ListingController.addRentalDetails
 );
 
 router.post(
