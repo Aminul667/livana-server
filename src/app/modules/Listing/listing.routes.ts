@@ -23,6 +23,36 @@ router.get(
 );
 
 router.get(
+  "/draft/listing-details/:id",
+  auth(UserRole.landlord),
+  ListingController.getListingDetails
+);
+
+router.get(
+  "/draft/location-details/:id",
+  auth(UserRole.landlord),
+  ListingController.getLocationDetails
+);
+
+router.get(
+  "/draft/features-amenities/:id",
+  auth(UserRole.landlord),
+  ListingController.getFeaturesAndAmenities
+);
+
+router.get(
+  "/draft/rental-details/:id",
+  auth(UserRole.landlord),
+  ListingController.getRentalDetails
+);
+
+router.get(
+  "/draft/media/:id",
+  auth(UserRole.landlord),
+  ListingController.getListingMedia
+);
+
+router.get(
   "/draft",
   auth(UserRole.landlord),
   ListingController.getAllDraftProperties

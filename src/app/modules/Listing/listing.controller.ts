@@ -266,4 +266,9 @@ export const ListingController = {
   addFeaturesAndAmenities,
   addRentalDetails,
   addListingMedia,
+  getListingDetails,
+  getLocationDetails,
+  getFeaturesAndAmenities,
+  getRentalDetails,
+  getListingMedia,
 };
