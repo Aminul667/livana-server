@@ -821,6 +821,99 @@ const addListingMediaIntoDB = async (req: IAuthRequest) => {
   return result;
 };
 
+const getListingDetailsFromDB = async (listingId: string) => {
+  const listingDetails = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: {
+      id: true,
+      bedrooms: true,
+      bathrooms: true,
+      areaSqFt: true,
+      floorNumber: true,
+      totalFloors: true,
+      furnished: true,
+      availableFrom: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return listingDetails;
+};
+
+const getLocationDetailsFromDB = async (listingId: string) => {
+  const locationDetails = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: {
+      id: true,
+      address: true,
+      city: true,
+      state: true,
+      postalCode: true,
+      country: true,
+      latitude: true,
+      longitude: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return locationDetails;
+};
+
+const getFeaturesAndAmenitiesFromDB = async (listingId: string) => {
+  const locationDetails = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: {
+      id: true,
+      hasParking: true,
+      hasLift: true,
+      hasBalcony: true,
+      heating: true,
+      cooling: true,
+      petFriendly: true,
+      internetIncluded: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return locationDetails;
+};
+
+const getRentalDetailsFromDB = async (listingId: string) => {
+  const rentalDetail = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: {
+      id: true,
+      monthlyRent: true,
+      weeklyRent: true,
+      rentFrequency: true,
+      depositAmount: true,
+      maintenanceFee: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return rentalDetail;
+};
+
+const getListingMediaFromDB = async (listingId: string) => {
+  const rentalDetail = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: {
+      id: true,
+      coverImage: true,
+      videoUrl: true,
+      propertyImages: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return rentalDetail;
+};
+
 export const ListingService = {
   // addPropertyIntoDB,
   getAllPropertiesFromDB,
@@ -833,4 +926,9 @@ export const ListingService = {
   addFeaturesAndAmenitiesIntoDB,
   addRentalDetailsIntoDB,
   addListingMediaIntoDB,
+  getListingDetailsFromDB,
+  getLocationDetailsFromDB,
+  getFeaturesAndAmenitiesFromDB,
+  getRentalDetailsFromDB,
+  getListingMediaFromDB,
 };

@@ -192,6 +192,68 @@ const addListingMedia = catchAsync(async (req: IAuthRequest, res: Response) => {
   });
 });
 
+const getListingDetails = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await ListingService.getListingDetailsFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Listing Details retrieved successfully!",
+    data: result,
+  });
+});
+
+const getLocationDetails = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await ListingService.getLocationDetailsFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Location Details retrieved successfully!",
+    data: result,
+  });
+});
+
+const getFeaturesAndAmenities = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const result = await ListingService.getFeaturesAndAmenitiesFromDB(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Features and Amenities retrieved successfully!",
+      data: result,
+    });
+  }
+);
+
+const getRentalDetails = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await ListingService.getRentalDetailsFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Rental Details retrieved successfully!",
+    data: result,
+  });
+});
+
+const getListingMedia = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await ListingService.getListingMediaFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Listing Media retrieved successfully!",
+    data: result,
+  });
+});
+
 export const ListingController = {
   // addProperty,
   getAllProperties,
