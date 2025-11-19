@@ -408,7 +408,7 @@ const getAllPropertiesFromDB = async (
 
 const getAllDraftPropertiesFromDB = async (userId: string) => {
   const result = await prisma.listing.findMany({
-    where: { userId, isDeleted: false },
+    where: { userId, isDeleted: false, status: ListingStatus.draft },
     include: {
       propertyImages: true,
     },
@@ -417,48 +417,43 @@ const getAllDraftPropertiesFromDB = async (userId: string) => {
   return result;
 };
 
-// const getDraftByIdFromDB = async (req: IAuthRequest) => {
-//   if (!req.user) {
-//     throw new Error("User information is missing.");
-//   }
+const getDraftByIdFromDB = async (userId: string, id: string) => {
+  const result = await prisma.listing.findFirst({
+    where: {
+      userId,
+      id,
+      isDeleted: false,
+      status: ListingStatus.draft,
+    },
+    include: {
+      propertyImages: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          email: true,
+          profile: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-//   const { userId } = req.user;
-//   const { id } = req.params;
-
-//   const result = await prisma.property.findFirst({
-//     where: {
-//       userId,
-//       id,
-//       isDeleted: false,
-//     },
-//     include: {
-//       images: {
-//         select: {
-//           id: true,
-//           url: true,
-//         },
-//       },
-//       user: {
-//         select: {
-//           id: true,
-//           email: true,
-//           profile: {
-//             select: {
-//               id: true,
-//               firstName: true,
-//               lastName: true,
-//               phone: true,
-//             },
-//           },
-//         },
-//       },
-//     },
-//   });
-
-//   return result;
-// };
+  return result;
+};
 
 // multi step
+
 const savePropertyIntoDB = async (userId: string, payload: TPropertyFor) => {
   const existingUser = await prisma.user.findUnique({
     where: { id: userId },
@@ -763,7 +758,7 @@ const addListingMediaIntoDB = async (req: IAuthRequest) => {
   }
 
   const listingId = req.params.id;
-  const videoUrl = req.body.data.videoUrl;
+  const videoUrl = req.body.videoUrl;
   const imageFiles = req.files as { images: Express.Multer.File[] };
 
   const listing = await prisma.listing.findUnique({
@@ -916,7 +911,7 @@ export const ListingService = {
   getAllPropertiesFromDB,
   // getPropertyByIdFromDB,
   getAllDraftPropertiesFromDB,
-  // getDraftByIdFromDB,
+  getDraftByIdFromDB,
   savePropertyIntoDB,
   addListingDetailsIntoDB,
   addLocationDetailsIntoDB,

@@ -58,11 +58,11 @@ router.get(
   ListingController.getAllDraftProperties
 );
 
-// router.get(
-//   "/draft/:id",
-//   auth(UserRole.landlord),
-//   ListingController.getDraftById
-// );
+router.get(
+  "/draft/:id",
+  auth(UserRole.landlord),
+  ListingController.getDraftById
+);
 
 // router.get("/:id", ListingController.getPropertyById);
 

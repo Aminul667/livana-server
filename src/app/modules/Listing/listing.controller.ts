@@ -63,16 +63,19 @@ const getAllDraftProperties = catchAsync(
   }
 );
 
-// const getDraftById = catchAsync(async (req: IAuthRequest, res: Response) => {
-//   const result = await ListingService.getDraftByIdFromDB(req);
+const getDraftById = catchAsync(async (req: IAuthRequest, res: Response) => {
+  const userId = req.user?.userId as string;
+  const listingId = req.params.id;
 
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "Draft property retrieved successfully!",
-//     data: result,
-//   });
-// });
+  const result = await ListingService.getDraftByIdFromDB(userId, listingId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Draft property retrieved successfully!",
+    data: result,
+  });
+});
 
 // multi step form
 const saveProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
@@ -261,7 +264,7 @@ export const ListingController = {
   getAllProperties,
   // getPropertyById,
   getAllDraftProperties,
-  // getDraftById,
+  getDraftById,
   saveProperty,
   addListingDetails,
   addLocationDetails,
