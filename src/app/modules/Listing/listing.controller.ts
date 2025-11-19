@@ -51,7 +51,9 @@ const getAllProperties = catchAsync(async (req: Request, res: Response) => {
 
 const getAllDraftProperties = catchAsync(
   async (req: IAuthRequest, res: Response) => {
-    const result = await ListingService.getAllDraftPropertiesFromDB(req);
+    const userId = req.user?.userId as string;
+
+    const result = await ListingService.getAllDraftPropertiesFromDB(userId);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

@@ -406,15 +406,12 @@ const getAllPropertiesFromDB = async (
 //   return property;
 // };
 
-const getAllDraftPropertiesFromDB = async (req: IAuthRequest) => {
-  if (!req.user) {
-    throw new Error("User information is missing.");
-  }
-
-  const userId = req.user.userId;
-
-  const result = prisma.property.findMany({
+const getAllDraftPropertiesFromDB = async (userId: string) => {
+  const result = await prisma.listing.findMany({
     where: { userId, isDeleted: false },
+    include: {
+      propertyImages: true,
+    },
   });
 
   return result;
