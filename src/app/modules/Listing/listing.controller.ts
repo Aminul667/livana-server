@@ -8,15 +8,15 @@ import pick from "../../../shared/pick";
 import { listingFilterableFields } from "./listing.constants";
 import ApiError from "../../errors/ApiErrors";
 
-const addProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
-  const result = await ListingService.addPropertyIntoDB(req);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Listing added successfully!",
-    data: result,
-  });
-});
+// const addProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
+//   const result = await ListingService.addPropertyIntoDB(req);
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "Listing added successfully!",
+//     data: result,
+//   });
+// });
 
 const getAllProperties = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(res.locals.query, listingFilterableFields);
@@ -37,17 +37,17 @@ const getAllProperties = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getPropertyById = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
+// const getPropertyById = catchAsync(async (req: Request, res: Response) => {
+//   const { id } = req.params;
 
-  const result = await ListingService.getPropertyByIdFromDB(id);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Property retrieved successfully!",
-    data: result,
-  });
-});
+//   const result = await ListingService.getPropertyByIdFromDB(id);
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "Property retrieved successfully!",
+//     data: result,
+//   });
+// });
 
 const getAllDraftProperties = catchAsync(
   async (req: IAuthRequest, res: Response) => {
@@ -61,16 +61,16 @@ const getAllDraftProperties = catchAsync(
   }
 );
 
-const getDraftById = catchAsync(async (req: IAuthRequest, res: Response) => {
-  const result = await ListingService.getDraftByIdFromDB(req);
+// const getDraftById = catchAsync(async (req: IAuthRequest, res: Response) => {
+//   const result = await ListingService.getDraftByIdFromDB(req);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Draft property retrieved successfully!",
-    data: result,
-  });
-});
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "Draft property retrieved successfully!",
+//     data: result,
+//   });
+// });
 
 // multi step form
 const saveProperty = catchAsync(async (req: IAuthRequest, res: Response) => {
@@ -182,15 +182,26 @@ const addRentalDetails = catchAsync(
   }
 );
 
+const addListingMedia = catchAsync(async (req: IAuthRequest, res: Response) => {
+  const result = await ListingService.addListingMediaIntoDB(req);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Property images added successfully!",
+    data: result,
+  });
+});
+
 export const ListingController = {
-  addProperty,
+  // addProperty,
   getAllProperties,
-  getPropertyById,
+  // getPropertyById,
   getAllDraftProperties,
-  getDraftById,
+  // getDraftById,
   saveProperty,
   addListingDetails,
   addLocationDetails,
   addFeaturesAndAmenities,
   addRentalDetails,
+  addListingMedia,
 };

@@ -100,8 +100,8 @@ model Property {
   status     ListingStatus @default(draft)
   isDeleted  Boolean       @default(false)
 
-  images PropertyImage[] // relation to image model
-  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // images PropertyImage[] 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -121,8 +121,8 @@ model Listing {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  listingType          ListingType?
-  
+  listingType ListingType?
+
   // details
   bedrooms             Int?
   bathrooms            Int?
@@ -160,12 +160,25 @@ model Listing {
   rentFrequency  RentFrequency?
   depositAmount  Float?
   maintenanceFee Float?
+  videoUrl       String?
+
+  status ListingStatus @default(draft)
+
+  isDeleted  Boolean @default(false)
+  isFeatured Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   listingProgress ListingProgress?
+  propertyImages  PropertyImage[]
 
+  @@index([userId])
+  @@index([latitude])
+  @@index([longitude])
+  @@index([monthlyRent])
+  @@index([bedrooms])
+  @@index([isDeleted, status, createdAt])
   @@map("listing")
 }
 
@@ -185,10 +198,11 @@ model ListingProgress {
 }
 
 model PropertyImage {
-  id         String   @id @default(uuid())
-  propertyId String
-  url        String // path or full URL
-  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  id        String  @id @default(uuid())
+  listingId String
+  url       String // path or full URL
+  // property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 

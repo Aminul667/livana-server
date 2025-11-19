@@ -19,77 +19,77 @@ import {
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 
-const addPropertyIntoDB = async (req: IAuthRequest) => {
-  if (!req.user) {
-    throw new Error("User information is missing.");
-  }
+// const addPropertyIntoDB = async (req: IAuthRequest) => {
+//   if (!req.user) {
+//     throw new Error("User information is missing.");
+//   }
 
-  const imageFiles = req.files as { images: Express.Multer.File[] };
+//   const imageFiles = req.files as { images: Express.Multer.File[] };
 
-  if (!imageFiles?.images?.length) {
-    throw new Error("At least one image is required.");
-  }
+//   if (!imageFiles?.images?.length) {
+//     throw new Error("At least one image is required.");
+//   }
 
-  const uploadedImagePaths = imageFiles.images.map((img) => img.path) || [];
+//   const uploadedImagePaths = imageFiles.images.map((img) => img.path) || [];
 
-  const userId = req.user.userId;
-  const {
-    availableFrom,
-    hasParking,
-    hasLift,
-    hasBalcony,
-    heating,
-    cooling,
-    petFriendly,
-    internetIncluded,
-  } = req.body;
+//   const userId = req.user.userId;
+//   const {
+//     availableFrom,
+//     hasParking,
+//     hasLift,
+//     hasBalcony,
+//     heating,
+//     cooling,
+//     petFriendly,
+//     internetIncluded,
+//   } = req.body;
 
-  const coverImage = uploadedImagePaths[0];
-  const { availableMonth, availableMonthNumber } =
-    extractMonthInfo(availableFrom);
+//   const coverImage = uploadedImagePaths[0];
+//   const { availableMonth, availableMonthNumber } =
+//     extractMonthInfo(availableFrom);
 
-  const amenitiesObject = {
-    hasParking,
-    hasLift,
-    hasBalcony,
-    heating,
-    cooling,
-    petFriendly,
-    internetIncluded,
-  };
+//   const amenitiesObject = {
+//     hasParking,
+//     hasLift,
+//     hasBalcony,
+//     heating,
+//     cooling,
+//     petFriendly,
+//     internetIncluded,
+//   };
 
-  const amenities = Object.entries(amenitiesObject)
-    .filter(([_, value]) => value)
-    .map(([key]) => key);
+//   const amenities = Object.entries(amenitiesObject)
+//     .filter(([_, value]) => value)
+//     .map(([key]) => key);
 
-  const propertyData = {
-    userId,
-    ...req.body,
-    coverImage,
-    availableMonth,
-    availableMonthNumber,
-    amenities,
-  };
+//   const propertyData = {
+//     userId,
+//     ...req.body,
+//     coverImage,
+//     availableMonth,
+//     availableMonthNumber,
+//     amenities,
+//   };
 
-  const result = await prisma.$transaction(async (tx) => {
-    const property = await tx.property.create({
-      data: propertyData,
-    });
+//   const result = await prisma.$transaction(async (tx) => {
+//     const property = await tx.property.create({
+//       data: propertyData,
+//     });
 
-    const imageData = uploadedImagePaths.map((path) => ({
-      propertyId: property.id,
-      url: path,
-    }));
+//     const imageData = uploadedImagePaths.map((path) => ({
+//       propertyId: property.id,
+//       url: path,
+//     }));
 
-    await tx.propertyImage.createMany({
-      data: imageData,
-    });
+//     await tx.propertyImage.createMany({
+//       data: imageData,
+//     });
 
-    return property;
-  });
+//     return property;
+//   });
 
-  return result;
-};
+//   return result;
+// };
 
 const getAllPropertiesFromDB = async (
   filters: any,
@@ -372,39 +372,39 @@ const getAllPropertiesFromDB = async (
   return { meta: { total, page, limit }, data: result };
 };
 
-const getPropertyByIdFromDB = async (id: string) => {
-  const property = await prisma.property.findFirst({
-    where: {
-      id,
-      isDeleted: false,
-      status: ListingStatus.published,
-    },
-    include: {
-      images: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          email: true,
-          profile: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              phone: true,
-            },
-          },
-        },
-      },
-    },
-  });
+// const getPropertyByIdFromDB = async (id: string) => {
+//   const property = await prisma.property.findFirst({
+//     where: {
+//       id,
+//       isDeleted: false,
+//       status: ListingStatus.published,
+//     },
+//     include: {
+//       images: {
+//         select: {
+//           id: true,
+//           url: true,
+//         },
+//       },
+//       user: {
+//         select: {
+//           id: true,
+//           email: true,
+//           profile: {
+//             select: {
+//               id: true,
+//               firstName: true,
+//               lastName: true,
+//               phone: true,
+//             },
+//           },
+//         },
+//       },
+//     },
+//   });
 
-  return property;
-};
+//   return property;
+// };
 
 const getAllDraftPropertiesFromDB = async (req: IAuthRequest) => {
   if (!req.user) {
@@ -420,46 +420,46 @@ const getAllDraftPropertiesFromDB = async (req: IAuthRequest) => {
   return result;
 };
 
-const getDraftByIdFromDB = async (req: IAuthRequest) => {
-  if (!req.user) {
-    throw new Error("User information is missing.");
-  }
+// const getDraftByIdFromDB = async (req: IAuthRequest) => {
+//   if (!req.user) {
+//     throw new Error("User information is missing.");
+//   }
 
-  const { userId } = req.user;
-  const { id } = req.params;
+//   const { userId } = req.user;
+//   const { id } = req.params;
 
-  const result = await prisma.property.findFirst({
-    where: {
-      userId,
-      id,
-      isDeleted: false,
-    },
-    include: {
-      images: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          email: true,
-          profile: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              phone: true,
-            },
-          },
-        },
-      },
-    },
-  });
+//   const result = await prisma.property.findFirst({
+//     where: {
+//       userId,
+//       id,
+//       isDeleted: false,
+//     },
+//     include: {
+//       images: {
+//         select: {
+//           id: true,
+//           url: true,
+//         },
+//       },
+//       user: {
+//         select: {
+//           id: true,
+//           email: true,
+//           profile: {
+//             select: {
+//               id: true,
+//               firstName: true,
+//               lastName: true,
+//               phone: true,
+//             },
+//           },
+//         },
+//       },
+//     },
+//   });
 
-  return result;
-};
+//   return result;
+// };
 
 // multi step
 const savePropertyIntoDB = async (userId: string, payload: TPropertyFor) => {
@@ -760,15 +760,77 @@ const addRentalDetailsIntoDB = async (
   return result;
 };
 
+const addListingMediaIntoDB = async (req: IAuthRequest) => {
+  if (!req.user) {
+    throw new Error("User information is missing.");
+  }
+
+  const listingId = req.params.id;
+  const videoUrl = req.body.data.videoUrl;
+  const imageFiles = req.files as { images: Express.Multer.File[] };
+
+  const listing = await prisma.listing.findUnique({
+    where: {
+      id: listingId,
+    },
+  });
+
+  if (!listing) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Listing not found");
+  }
+
+  if (!imageFiles?.images?.length) {
+    throw new Error("At least one image is required.");
+  }
+
+  const currentStep = await prisma.listingProgress.findUnique({
+    where: { listingId },
+  });
+
+  const uploadedImagePaths = imageFiles.images.map((img) => img.path) || [];
+  const coverImage = uploadedImagePaths[0];
+
+  const imageData = uploadedImagePaths.map((path) => ({
+    listingId,
+    url: path,
+  }));
+
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.listing.update({
+      where: { id: listingId },
+      data: { coverImage, videoUrl },
+    });
+
+    await tx.propertyImage.createMany({
+      data: imageData,
+    });
+
+    if (currentStep && currentStep.currentStep < 6) {
+      await tx.listingProgress.update({
+        where: { listingId },
+        data: {
+          currentStep: 6,
+          isCompleted: true,
+        },
+      });
+    }
+
+    return imageData;
+  });
+
+  return result;
+};
+
 export const ListingService = {
-  addPropertyIntoDB,
+  // addPropertyIntoDB,
   getAllPropertiesFromDB,
-  getPropertyByIdFromDB,
+  // getPropertyByIdFromDB,
   getAllDraftPropertiesFromDB,
-  getDraftByIdFromDB,
+  // getDraftByIdFromDB,
   savePropertyIntoDB,
   addListingDetailsIntoDB,
   addLocationDetailsIntoDB,
   addFeaturesAndAmenitiesIntoDB,
   addRentalDetailsIntoDB,
+  addListingMediaIntoDB,
 };

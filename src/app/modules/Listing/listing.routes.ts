@@ -28,13 +28,13 @@ router.get(
   ListingController.getAllDraftProperties
 );
 
-router.get(
-  "/draft/:id",
-  auth(UserRole.landlord),
-  ListingController.getDraftById
-);
+// router.get(
+//   "/draft/:id",
+//   auth(UserRole.landlord),
+//   ListingController.getDraftById
+// );
 
-router.get("/:id", ListingController.getPropertyById);
+// router.get("/:id", ListingController.getPropertyById);
 
 router.post(
   "/drafts",
@@ -71,16 +71,27 @@ router.patch(
   ListingController.addRentalDetails
 );
 
-router.post(
-  "/add",
+router.patch(
+  "/drafts/media/:id",
   auth(UserRole.landlord),
   multerUpload.fields([{ name: "images" }]),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
   },
-  ListingController.addProperty
+  ListingController.addListingMedia
 );
+
+// router.post(
+//   "/add",
+//   auth(UserRole.landlord),
+//   multerUpload.fields([{ name: "images" }]),
+//   (req: Request, res: Response, next: NextFunction) => {
+//     req.body = JSON.parse(req.body.data);
+//     next();
+//   },
+//   ListingController.addProperty
+// );
 
 // router.post(
 //   "/drafts",
